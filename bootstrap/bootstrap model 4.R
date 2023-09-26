@@ -1,42 +1,3 @@
-## load libraries and data
-library(meboot)
-library(readxl)
-source('../funcs.R')
-
-# list of matrices containg all dengue incidence and characteristics data
-data <- loadRData('../updated-data/list-dengue.rdata')
-
-## ---- create bootstrap samples -----
-
-# change here 
-subgroup = 'total'
-
-
-# bootstrap sample to create
-reps=100
-
-real <- data[[subgroup]]
-bb <- list()
-for (i in seq(ncol(real))) {
-  print(i)
-  bb[[i]] <- meboot(x=real[,i], trim = list(xmin=0), reps=reps)$ensemble
-}
-print('--- done bootstrap ---')
-
-#re-arrage data as needed
-bt.data <- list()
-for (i in seq(reps)) {
-  temp <- c()
-  for (j in seq(ncol(real))) {
-    temp <- cbind(temp,as.matrix(bb[[j]][,i]))
-  }
-  colnames(temp) <- colnames(real)
-  bt.data[[i]] <- as.data.frame(temp)
-}
-rm(bb)
-save(bt.data,file = paste0('bb-',subgroup,'.rdata') )
-print('-- saved --')
-
 #### run scm model ####
 ##loading data
 library(stringi)
@@ -81,7 +42,7 @@ run.model <- function(data,i){
   times.dep  <- cbind("subgrp"  = c(1500,t))
   times.pred <- cbind("subgrp"  = c(1500,t))
   
-  m4 <- mscmt(total, treatment.identifier, controls.identifier, times.dep, times.pred,verbose = F)
+  m4 <- mscmt(data, treatment.identifier, controls.identifier, times.dep, times.pred,verbose = F)
   
   return(m4)
 }
