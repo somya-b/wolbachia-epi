@@ -17,9 +17,6 @@ listData <- lapply(listData, function(x) {rownames(x)<-mapT$map;x })
 subData <- listData[10:35] #extracting covariate data
 d1$Date <- sapply(d1$Date, function(x) {mapT$map[mapT$time ==x]})
 
-controls.identifier <- co
-treatment.identifier <- co 
-
 #model function to generate synthetic control for donor group different different models
 # @subgrp : subgroup of cases
 # @cv : validation period 
@@ -31,6 +28,8 @@ model <- function(subgrp, m){
     
     t <- d1$Date[4] #taking treatment start date as earliest start date for all towns in donor group
     times.dep  <- cbind("subgrp"  = c(1560,t))
+    treatment.identifier <- co[i] 
+    controls.identifier <- co[!co %in% c(treatment.identifier)]
     
     if (m==4){
       times.pred <- cbind("subgrp"  = c(1560,t))
